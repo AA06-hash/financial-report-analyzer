@@ -1,4 +1,4 @@
-## Financial Report Analyzer
+# Financial Report Analyzer
 
 ## Description: 
     A web-based dashboard to analyze company financial performance using
