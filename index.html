@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financial Report Analyzer</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body, * { font-family: 'IBM Plex Sans', sans-serif; box-sizing: border-box; }
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+
+    /* Gradient background for light mode */
+    body { background: linear-gradient(135deg, #f3f4f6, #e5e7eb); color: #111827; }
+    .card { background: rgba(255,255,255,0.95); border-radius: 12px; padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .metric-card { border-left: 4px solid; padding: 1rem; border-radius: 8px; }
+    .positive { color: #10b981; }
+    .negative { color: #ef4444; }
+    .neutral { color: #f59e0b; }
+
+    /* Dark Mode */
+    .dark body { background: #0f172a; color: #f0f0f0; }
+    .dark .card { background: #1e293b; box-shadow: 0 4px 12px rgba(0,0,0,0.6); }
+    .dark .metric-card { background: #1e293b; border-left-color: #3b82f6; }
+    .dark select { background-color: #1f2937; color: #f0f0f0; border-color: #4b5563; }
+    .dark select option { background-color: #1f2937; color: #f0f0f0; }
+
+    .tab { padding: 0.75rem 1.5rem; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s; font-weight: 500; }
+    .tab.active { border-bottom-color: #3b82f6; color: #3b82f6; }
+
+    /* Toggle button */
+    #toggleDark { cursor: pointer; padding: 0.5rem 1rem; border-radius: 6px; margin-left: 1rem; background-color: #374151; color: #f0f0f0; }
+  </style>
+</head>
+<body class="h-full m-0 p-0">
+  <div class="w-full max-w-7xl mx-auto p-4">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 id="dashboardTitle" class="text-3xl font-bold">Financial Report Analyzer</h1>
+        <p class="text-gray-500 dark:text-gray-300">Real-time earnings & insights</p>
+      </div>
+      <div class="flex items-center">
+        <span id="lastUpdated" class="mono mr-4"></span>
+        <button id="toggleDark">🌙 Dark Mode</button>
+      </div>
+    </div>
+
+    <!-- Company Selector -->
+    <div class="card mb-6">
+      <label for="companySelect" id="companyLabel" class="block mb-2 font-semibold">Select Company</label>
+      <select id="companySelect" class="w-full p-3 rounded-lg">
+        <option value="AAPL">Apple Inc. (AAPL)</option>
+        <option value="MSFT">Microsoft (MSFT)</option>
+        <option value="GOOGL">Alphabet (GOOGL)</option>
+        <option value="AMZN">Amazon (AMZN)</option>
+      </select>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div class="metric-card border-blue-500">
+        <div class="text-sm font-semibold">Revenue (TTM)</div>
+        <div id="revenue" class="text-xl font-bold mono">$394.3B</div>
+        <div id="revenueChange" class="text-sm positive">↑ 11.2% YoY</div>
+      </div>
+      <div class="metric-card border-green-500">
+        <div class="text-sm font-semibold">Net Income</div>
+        <div id="netIncome" class="text-xl font-bold mono">$99.8B</div>
+        <div id="incomeChange" class="text-sm positive">↑ 8.7% YoY</div>
+      </div>
+      <div class="metric-card border-purple-500">
+        <div class="text-sm font-semibold">EPS</div>
+        <div id="eps" class="text-xl font-bold mono">$6.42</div>
+        <div id="epsChange" class="text-sm positive">↑ 13.1% YoY</div>
+      </div>
+      <div class="metric-card border-yellow-500">
+        <div class="text-sm font-semibold">Sentiment Score</div>
+        <div id="sentiment" class="text-xl font-bold">8.4/10</div>
+        <div class="text-sm text-gray-500 dark:text-gray-300">Positive Outlook</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="card mb-6">
+      <div class="flex border-b border-gray-200 dark:border-gray-600" id="tabContainer">
+        <div class="tab active" data-tab="trends">📊 Trends</div>
+        <div class="tab" data-tab="comparison">🔍 Peer Comparison</div>
+        <div class="tab" data-tab="risks">⚠️ Risk Factors</div>
+        <div class="tab" data-tab="sentiment">💬 Sentiment</div>
+      </div>
+      <div id="tabContent" class="p-4">
+        <div id="trendsTab" class="tab-content">
+          <canvas id="trendsChart" height="100"></canvas>
+        </div>
+        <div id="comparisonTab" class="tab-content hidden">
+          <canvas id="comparisonChart" height="100"></canvas>
+        </div>
+        <div id="risksTab" class="tab-content hidden">
+          <p>Supply chain, competition, and regulatory risks.</p>
+        </div>
+        <div id="sentimentTab" class="tab-content hidden">
+          <canvas id="sentimentChart" height="100"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Dark mode toggle
+    const toggleBtn = document.getElementById('toggleDark');
+    toggleBtn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      toggleBtn.textContent = document.documentElement.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
+    });
+
+    // Timestamp
+    function updateLastUpdated() {
+      const now = new Date();
+      document.getElementById('lastUpdated').textContent = `Last Updated: ${now.toLocaleTimeString()}`;
+    }
+    updateLastUpdated();
+    setInterval(updateLastUpdated, 60000);
+
+    // Company data
+    const companyData = {
+      AAPL: { revenue: "$394.3B", revenueChange: "↑ 11.2% YoY", netIncome: "$99.8B", incomeChange: "↑ 8.7% YoY", eps: "$6.42", epsChange: "↑ 13.1% YoY", sentiment: "8.4/10", trends: [305,347,365,387,394], earnings:[76,86,92,97,100]},
+      MSFT: { revenue: "$227.6B", revenueChange: "↑ 18.3% YoY", netIncome: "$88.5B", incomeChange: "↑ 22.1% YoY", eps: "$11.83", epsChange: "↑ 21.8% YoY", sentiment: "8.9/10", trends: [143,168,198,212,228], earnings:[61,68,73,82,89]},
+      GOOGL:{ revenue:"$307.4B", revenueChange:"↑ 9.5% YoY", netIncome:"$73.8B", incomeChange:"↑ 14.2% YoY", eps:"$5.80", epsChange:"↑ 15.7% YoY", sentiment:"7.8/10", trends:[257,283,282,297,307], earnings:[66,70,65,72,74]},
+      AMZN:{ revenue:"$574.8B", revenueChange:"↑ 11.8% YoY", netIncome:"$30.4B", incomeChange:"↑ 34.6% YoY", eps:"$2.90", epsChange:"↑ 38.2% YoY", sentiment:"7.2/10", trends:[469,514,524,554,575], earnings:[33,21,-3,23,30]}
+    };
+
+    // Update dashboard
+    const companySelect = document.getElementById('companySelect');
+    function updateDashboard(ticker){
+      const data = companyData[ticker];
+      document.getElementById('revenue').textContent = data.revenue;
+      document.getElementById('revenueChange').textContent = data.revenueChange;
+      document.getElementById('netIncome').textContent = data.netIncome;
+      document.getElementById('incomeChange').textContent = data.incomeChange;
+      document.getElementById('eps').textContent = data.eps;
+      document.getElementById('epsChange').textContent = data.epsChange;
+      document.getElementById('sentiment').textContent = data.sentiment;
+      updateTrendsChart(data.trends,data.earnings);
+    }
+    companySelect.addEventListener('change', e=>updateDashboard(e.target.value));
+
+    // Chart.js: Trends
+    let trendsChart;
+    function updateTrendsChart(revenue, earnings){
+      const ctx = document.getElementById('trendsChart');
+      if(trendsChart) trendsChart.destroy();
+      trendsChart = new Chart(ctx,{
+        type:'line',
+        data:{
+          labels:['2019','2020','2021','2022','2023'],
+          datasets:[
+            {label:'Revenue ($B)', data: revenue, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.1)', fill:true, tension:0.3, borderWidth:2},
+            {label:'Net Income ($B)', data: earnings, borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.1)', fill:true, tension:0.3, borderWidth:2}
+          ]
+        },
+        options:{responsive:true, plugins:{legend:{position:'top'}}, scales:{y:{beginAtZero:true}}}
+      });
+    }
+
+    // Initialize
+    updateDashboard('AAPL');
+  </script>
+</body>
+</html>
