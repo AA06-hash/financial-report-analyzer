@@ -19,6 +19,7 @@
 
 ## Setup:
   Steps:
+  
     - "Clone the repository: git clone https://github.com/AA06-hash/financial-report-analyzer.git"
     - "Open index.html in your browser"
     - "Select a company and view its financial reports"
