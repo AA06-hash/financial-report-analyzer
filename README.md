@@ -1,24 +1,31 @@
-**Financial Report Analyzer**
+# Financial Report Analyzer
 
-Project Overview
-The Financial Report Analyzer is an interactive dashboard for tracking key financial metrics of major companies.  
-It visualizes revenue, net income, EPS, sentiment scores, and trends in a single interface.
+A web-based dashboard to analyze company financial performance using **interactive charts** and **insights**.
 
-Features
-- Company selector for AAPL, MSFT, GOOGL, AMZN
-- Revenue, Net Income, EPS, Sentiment Score
-- Trends over multiple years
-- Peer Comparison, Risk Factors, Sentiment tabs
-- Dark/Light mode toggle
+## Features
+- Company selection (e.g., AAPL, MSFT, GOOGL)
+- Revenue, EPS, Net Income display
+- Interactive charts
+- Dark mode
+- Risk and sentiment analysis
 
-Technologies
-- HTML, CSS, JavaScript
+## Technologies Used
+- HTML
 - Tailwind CSS
+- JavaScript
 - Chart.js
-- GitHub for version control
 
-Installation
-```bash
-git clone https://github.com/AA06-hash/financial-report-analyzer.git
-cd financial-report-analyzer
+## Setup
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   Open index.html in your browser.
+   Select a company and view its financial reports.
 
+## Documentation
+Detailed documentation is available in the docs folder.
+
+## Author
+AA06-hash
+This is **ready to go**, fully formatted, and will render cleanly on GitHub.  
+You just need to replace `<repository-url>` with your actual GitHub repository link and then push it.  
