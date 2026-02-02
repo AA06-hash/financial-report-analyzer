@@ -1,6 +1,6 @@
 ## Financial Report Analyzer
 
-  Description: >
+## Description: 
     A web-based dashboard to analyze company financial performance using
     interactive charts and insights.
 
