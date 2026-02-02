@@ -18,14 +18,14 @@ A web-based dashboard to analyze company financial performance using **interacti
 ## Setup
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   Open index.html in your browser.
-   Select a company and view its financial reports.
+   git clone https://github.com/AA06-hash/financial-report-analyzer.git
 
-Documentation
+    Open index.html in your browser.
+
+    Select a company and view its financial reports.
+
+## Documentation
 Detailed documentation is available in the docs folder.
 
-Author
+## Author
 AA06-hash
-This is **ready to go**, fully formatted, and will render cleanly on GitHub.  
-You just need to replace `<repository-url>` with your actual GitHub repository link and then push it.  
