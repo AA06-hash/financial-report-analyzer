@@ -1,0 +1,15 @@
+{
+  "name": "Amazon.com Inc. (AMZN)",
+  "revenue": "$574.8B",
+  "revenueChange": "↑ 11.8% YoY",
+  "netIncome": "$30.4B",
+  "incomeChange": "↑ 34.6% YoY",
+  "eps": "$2.90",
+  "epsChange": "↑ 38.2% YoY",
+  "sentiment": "7.2/10",
+  "sentimentText": "Cautious Outlook",
+  "trends": [469,514,524,554,575],
+  "earnings": [33,21,-3,23,30],
+  "peer": [394,227,307,575],
+  "sentimentScores": [8.4,8.9,7.8,7.2]
+}

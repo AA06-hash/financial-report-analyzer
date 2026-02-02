@@ -1,0 +1,15 @@
+{
+  "name": "Microsoft Corp. (MSFT)",
+  "revenue": "$227.6B",
+  "revenueChange": "↑ 18.3% YoY",
+  "netIncome": "$88.5B",
+  "incomeChange": "↑ 22.1% YoY",
+  "eps": "$11.83",
+  "epsChange": "↑ 21.8% YoY",
+  "sentiment": "8.9/10",
+  "sentimentText": "Strong Outlook",
+  "trends": [143,168,198,212,228],
+  "earnings": [61,68,73,82,89],
+  "peer": [394,227,307,575],
+  "sentimentScores": [8.4,8.9,7.8,7.2]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Alphabet Inc. (GOOGL)",
+  "revenue": "$307.4B",
+  "revenueChange": "↑ 9.5% YoY",
+  "netIncome": "$73.8B",
+  "incomeChange": "↑ 14.2% YoY",
+  "eps": "$5.80",
+  "epsChange": "↑ 15.7% YoY",
+  "sentiment": "7.8/10",
+  "sentimentText": "Moderate Outlook",
+  "trends": [257,283,282,297,307],
+  "earnings": [66,70,65,72,74],
+  "peer": [394,227,307,575],
+  "sentimentScores": [8.4,8.9,7.8,7.2]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Apple Inc. (AAPL)",
+  "revenue": "$394.3B",
+  "revenueChange": "↑ 11.2% YoY",
+  "netIncome": "$99.8B",
+  "incomeChange": "↑ 8.7% YoY",
+  "eps": "$6.42",
+  "epsChange": "↑ 13.1% YoY",
+  "sentiment": "8.4/10",
+  "sentimentText": "Positive Outlook",
+  "trends": [305,347,365,387,394],
+  "earnings": [76,86,92,97,100],
+  "peer": [394,227,307,575],
+  "sentimentScores": [8.4,8.9,7.8,7.2]
+}
