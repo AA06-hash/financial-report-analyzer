@@ -27,5 +27,6 @@ Detailed documentation is available in the docs folder.
 
 ## Author
 AA06-hash
+
 This is **ready to go**, fully formatted, and will render cleanly on GitHub.  
 You just need to replace `<repository-url>` with your actual GitHub repository link and then push it.  
