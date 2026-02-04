@@ -1,36 +1,29 @@
-// ================================
-// Financial Report Analyzer Script
-// ================================
-
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ---------- Dark Mode ----------
+  // ---------------- DARK MODE ----------------
+
   const toggleBtn = document.getElementById("toggleDark");
 
-  if (toggleBtn) {
-
-    if (localStorage.getItem("darkMode") === "true") {
-      document.documentElement.classList.add("dark");
-    }
-
-    updateDarkButton();
-
-    toggleBtn.addEventListener("click", () => {
-
-      document.documentElement.classList.toggle("dark");
-
-      const dark =
-        document.documentElement.classList.contains("dark");
-
-      localStorage.setItem("darkMode", dark);
-
-      updateDarkButton();
-    });
+  if (localStorage.getItem("darkMode") === "true") {
+    document.documentElement.classList.add("dark");
   }
 
-  function updateDarkButton() {
+  updateDarkText();
 
-    if (!toggleBtn) return;
+  toggleBtn.addEventListener("click", () => {
+
+    document.documentElement.classList.toggle("dark");
+
+    const dark =
+      document.documentElement.classList.contains("dark");
+
+    localStorage.setItem("darkMode", dark);
+
+    updateDarkText();
+  });
+
+
+  function updateDarkText() {
 
     toggleBtn.textContent =
       document.documentElement.classList.contains("dark")
@@ -40,25 +33,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-  // ---------- Timestamp ----------
+  // ---------------- TIME ----------------
+
   const lastUpdated = document.getElementById("lastUpdated");
 
-  if (lastUpdated) {
+  function updateTime() {
 
-    function updateTime() {
-
-      lastUpdated.textContent =
-        `Last Updated: ${new Date().toLocaleTimeString()}`;
-    }
-
-    updateTime();
-
-    setInterval(updateTime, 60000);
+    lastUpdated.textContent =
+      "Last Updated: " + new Date().toLocaleTimeString();
   }
 
+  updateTime();
+  setInterval(updateTime, 60000);
 
 
-  // ---------- Company Selector ----------
+
+  // ---------------- DATA ----------------
+
+  const companies = ["AAPL", "MSFT", "GOOGL", "AMZN"];
+
+  const companyData = {};
+
   const companySelect =
     document.getElementById("companySelect");
 
@@ -66,59 +61,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-  // ---------- Data ----------
-  const companies = ["AAPL", "MSFT", "GOOGL", "AMZN"];
-
-  const companyData = {};
-
-
-
-  // ---------- Load JSON ----------
   async function loadData() {
 
-    try {
+    for (let ticker of companies) {
 
-      for (const ticker of companies) {
+      const res = await fetch(`./data/${ticker}.json`);
 
-        const res =
-          await fetch(`data/${ticker}.json`);
+      const data = await res.json();
 
-        if (!res.ok) {
-          throw new Error(`Missing ${ticker}.json`);
-        }
+      companyData[ticker] = data;
 
-        const json = await res.json();
+      const option = document.createElement("option");
 
-        companyData[ticker] = json;
+      option.value = ticker;
+      option.textContent = data.name;
 
-        if (companySelect) {
-
-          const option =
-            document.createElement("option");
-
-          option.value = ticker;
-
-          option.textContent = json.name;
-
-          companySelect.appendChild(option);
-        }
-      }
-
-      updateDashboard("AAPL");
-
-    } catch (err) {
-
-      console.error("Data Load Error:", err);
-
-      alert("Failed to load company data.");
+      companySelect.appendChild(option);
     }
+
+    updateDashboard("AAPL");
   }
 
   loadData();
 
 
 
-  // ---------- Update Dashboard ----------
+  // ---------------- DASHBOARD ----------------
+
   function updateDashboard(ticker) {
 
     const data = companyData[ticker];
@@ -127,209 +96,157 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-    // ----- Metrics -----
-    const metricsContainer =
+    // Metrics
+
+    const metrics =
       document.getElementById("metricsContainer");
 
-    if (!metricsContainer) return;
+    metrics.innerHTML = `
 
-    metricsContainer.innerHTML = `
-
-      <div class="metric-card border-blue-500">
-        <div class="text-sm font-semibold">
-          Revenue (TTM)
-        </div>
-        <div class="text-xl font-bold mono">
-          ${data.revenue}
-        </div>
-        <div class="text-sm">
-          ${data.revenueChange}
-        </div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded shadow">
+        <h3>Revenue</h3>
+        <p class="text-xl">${data.revenue}</p>
+        <p>${data.revenueChange}</p>
       </div>
 
-      <div class="metric-card border-green-500">
-        <div class="text-sm font-semibold">
-          Net Income
-        </div>
-        <div class="text-xl font-bold mono">
-          ${data.netIncome}
-        </div>
-        <div class="text-sm">
-          ${data.incomeChange}
-        </div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded shadow">
+        <h3>Net Income</h3>
+        <p class="text-xl">${data.netIncome}</p>
+        <p>${data.incomeChange}</p>
       </div>
 
-      <div class="metric-card border-purple-500">
-        <div class="text-sm font-semibold">
-          EPS
-        </div>
-        <div class="text-xl font-bold mono">
-          ${data.eps}
-        </div>
-        <div class="text-sm">
-          ${data.epsChange}
-        </div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded shadow">
+        <h3>EPS</h3>
+        <p class="text-xl">${data.eps}</p>
+        <p>${data.epsChange}</p>
       </div>
 
-      <div class="metric-card border-yellow-500">
-        <div class="text-sm font-semibold">
-          Sentiment
-        </div>
-        <div class="text-xl font-bold">
-          ${data.sentiment}
-        </div>
-        <div class="text-sm text-gray-500">
-          ${data.sentimentText}
-        </div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded shadow">
+        <h3>Sentiment</h3>
+        <p class="text-xl">${data.sentiment}</p>
+        <p>${data.sentimentText}</p>
       </div>
 
     `;
 
 
 
-    // ----- Charts -----
-    drawCharts(data);
+    // Charts
+
+    drawTrends(data);
+    drawCompare(data);
+    drawSentiment(data);
   }
 
 
 
-  // ---------- Charts ----------
-  function drawCharts(data) {
+  function drawTrends(data) {
 
-    // ----- Trend Chart -----
     const ctx =
       document.getElementById("trendsChart");
 
-    if (ctx) {
+    if (charts.trends) charts.trends.destroy();
 
-      if (charts.trends) charts.trends.destroy();
+    charts.trends = new Chart(ctx, {
 
-      charts.trends = new Chart(ctx, {
+      type: "line",
 
-        type: "line",
+      data: {
 
-        data: {
+        labels: ["2019", "2020", "2021", "2022", "2023"],
 
-          labels: ["2019", "2020", "2021", "2022", "2023"],
+        datasets: [
 
-          datasets: [
+          {
+            label: "Revenue",
+            data: data.trends,
+            borderColor: "blue",
+            fill: false
+          },
 
-            {
-              label: "Revenue ($B)",
-              data: data.trends,
-              borderColor: "#3b82f6",
-              backgroundColor: "rgba(59,130,246,0.1)",
-              fill: true,
-              tension: 0.3
-            },
-
-            {
-              label: "Net Income ($B)",
-              data: data.earnings,
-              borderColor: "#10b981",
-              backgroundColor: "rgba(16,185,129,0.1)",
-              fill: true,
-              tension: 0.3
-            }
-          ]
-        },
-
-        options: {
-          responsive: true,
-          scales: {
-            y: { beginAtZero: true }
+          {
+            label: "Earnings",
+            data: data.earnings,
+            borderColor: "green",
+            fill: false
           }
-        }
-      });
-    }
 
+        ]
+      }
 
-
-    // ----- Comparison Chart -----
-    const ctx2 =
-      document.getElementById("comparisonChart");
-
-    if (ctx2) {
-
-      if (charts.comparison) charts.comparison.destroy();
-
-      charts.comparison = new Chart(ctx2, {
-
-        type: "bar",
-
-        data: {
-
-          labels: ["Apple", "Microsoft", "Google", "Amazon"],
-
-          datasets: [
-            {
-              label: "Revenue ($B)",
-              data: data.peer,
-              backgroundColor: [
-                "#3b82f6",
-                "#10b981",
-                "#8b5cf6",
-                "#f59e0b"
-              ]
-            }
-          ]
-        },
-
-        options: {
-          responsive: true,
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
-      });
-    }
-
-
-
-    // ----- Sentiment Chart -----
-    const ctx3 =
-      document.getElementById("sentimentChart");
-
-    if (ctx3) {
-
-      if (charts.sentiment) charts.sentiment.destroy();
-
-      charts.sentiment = new Chart(ctx3, {
-
-        type: "doughnut",
-
-        data: {
-
-          labels: ["Apple", "Microsoft", "Google", "Amazon"],
-
-          datasets: [
-            {
-              data: data.sentimentScores,
-              backgroundColor: [
-                "#3b82f6",
-                "#10b981",
-                "#8b5cf6",
-                "#f59e0b"
-              ]
-            }
-          ]
-        },
-
-        options: {
-          responsive: true
-        }
-      });
-    }
+    });
   }
 
 
 
-  // ---------- Tabs ----------
-  const tabs =
-    document.querySelectorAll(".tab");
+  function drawCompare(data) {
 
-  const tabContents =
+    const ctx =
+      document.getElementById("comparisonChart");
+
+    if (charts.compare) charts.compare.destroy();
+
+    charts.compare = new Chart(ctx, {
+
+      type: "bar",
+
+      data: {
+
+        labels: ["Apple", "Microsoft", "Google", "Amazon"],
+
+        datasets: [
+          {
+            label: "Revenue",
+            data: data.peer,
+            backgroundColor: "orange"
+          }
+        ]
+      }
+
+    });
+  }
+
+
+
+  function drawSentiment(data) {
+
+    const ctx =
+      document.getElementById("sentimentChart");
+
+    if (charts.sentiment) charts.sentiment.destroy();
+
+    charts.sentiment = new Chart(ctx, {
+
+      type: "doughnut",
+
+      data: {
+
+        labels: ["Apple", "Microsoft", "Google", "Amazon"],
+
+        datasets: [
+          {
+            data: data.sentimentScores,
+            backgroundColor: [
+              "blue",
+              "green",
+              "purple",
+              "orange"
+            ]
+          }
+        ]
+      }
+
+    });
+  }
+
+
+
+  // ---------------- TABS ----------------
+
+  const tabs = document.querySelectorAll(".tab");
+  const contents =
     document.querySelectorAll(".tab-content");
+
 
   tabs.forEach(tab => {
 
@@ -339,73 +256,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
       tab.classList.add("active");
 
-      const target =
-        tab.dataset.tab + "Tab";
+      const target = tab.dataset.tab + "Tab";
 
-      tabContents.forEach(c =>
-        c.classList.add("hidden")
-      );
+      contents.forEach(c => c.classList.add("hidden"));
 
-      const active =
-        document.getElementById(target);
-
-      if (active) active.classList.remove("hidden");
+      document
+        .getElementById(target)
+        .classList.remove("hidden");
     });
   });
 
 
 
-  // ---------- Selector Change ----------
-  if (companySelect) {
+  // ---------------- SELECT ----------------
 
-    companySelect.addEventListener("change", e => {
+  companySelect.addEventListener("change", e => {
 
-      updateDashboard(e.target.value);
-
-    });
-  }
+    updateDashboard(e.target.value);
+  });
 
 
 
-  // ---------- Voice Summary ----------
+  // ---------------- VOICE ----------------
+
   const voiceBtn =
     document.getElementById("voiceBtn");
 
-  if (voiceBtn) {
 
-    voiceBtn.addEventListener("click", () => {
+  voiceBtn.addEventListener("click", () => {
 
-      const ticker =
-        companySelect.value;
-
-      speakSummary(ticker);
-    });
-  }
-
-
-
-  function speakSummary(ticker) {
+    const ticker = companySelect.value;
 
     const data = companyData[ticker];
 
     if (!data) return;
 
     const text = `
-      Financial summary for ${ticker}.
-      Revenue is ${data.revenue}.
-      Net income is ${data.netIncome}.
-      Earnings per share is ${data.eps}.
-      Overall sentiment is ${data.sentimentText}.
+      Financial report for ${ticker}.
+      Revenue ${data.revenue}.
+      Net income ${data.netIncome}.
+      Earnings per share ${data.eps}.
+      Sentiment ${data.sentimentText}.
     `;
 
     const speech =
       new SpeechSynthesisUtterance(text);
 
-    speech.rate = 1;
-    speech.pitch = 1;
-    speech.volume = 1;
-
     window.speechSynthesis.speak(speech);
-  }
+  });
 
 });

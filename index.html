@@ -1,69 +1,107 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Financial Report Analyzer</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<!-- Styles & Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+  <title>Financial Report Analyzer</title>
 
-<!-- Libraries -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="./style.css" />
+
 </head>
-<body class="h-full m-0 p-0">
-<div class="w-full max-w-7xl mx-auto p-4">
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
 
   <!-- Header -->
-  <div class="flex justify-between items-center mb-6">
-    <div>
-      <h1 class="text-3xl font-bold">Financial Report Analyzer</h1>
-      <p class="text-gray-500 dark:text-gray-300">Real-time earnings & insights</p>
+  <header class="bg-white dark:bg-gray-800 p-4 shadow flex justify-between items-center">
+
+    <h1 class="text-2xl font-bold">
+      Financial Report Analyzer
+    </h1>
+
+    <div class="flex items-center gap-4">
+
+      <span id="lastUpdated"></span>
+
+      <button id="toggleDark"
+        class="bg-gray-700 text-white px-3 py-1 rounded">
+        🌙 Dark Mode
+      </button>
+
     </div>
-    <div class="flex items-center">
-      <span id="lastUpdated" class="mono mr-4"></span>
-      <button id="toggleDark">🌙 Dark Mode</button>
-    </div>
+
+  </header>
+
+
+  <!-- Controls -->
+  <div class="p-4 flex gap-4 items-center">
+
+    <select id="companySelect"
+      class="p-2 border rounded text-black">
+    </select>
+
+    <button id="voiceBtn"
+      class="bg-blue-600 text-white px-4 py-2 rounded">
+      🎤 Voice Summary
+    </button>
+
   </div>
 
-  <!-- Company Selector -->
-  <div class="card mb-6">
-    <label for="companySelect" class="block mb-2 font-semibold">Select Company</label>
-    <select id="companySelect" class="w-full p-3 rounded-lg"></select>
+
+  <!-- Metrics -->
+  <div id="metricsContainer"
+    class="grid grid-cols-1 md:grid-cols-4 gap-4 p-4">
   </div>
 
-  <!-- Key Metrics -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8" id="metricsContainer"></div>
 
   <!-- Tabs -->
-  <div class="card mb-6">
-    <div class="flex border-b border-gray-200 dark:border-gray-600" id="tabContainer">
-      <div class="tab active" data-tab="trends">📊 Trends</div>
-      <div class="tab" data-tab="comparison">🔍 Peer Comparison</div>
-      <div class="tab" data-tab="risks">⚠️ Risk Factors</div>
-      <div class="tab" data-tab="sentiment">💬 Sentiment</div>
-    </div>
-    <div id="tabContent" class="p-4">
-      <div id="trendsTab" class="tab-content">
-        <canvas id="trendsChart" height="100"></canvas>
-      </div>
-      <div id="comparisonTab" class="tab-content hidden">
-        <canvas id="comparisonChart" height="100"></canvas>
-      </div>
-      <div id="risksTab" class="tab-content hidden">
-        <p>Supply chain, competition, and regulatory risks.</p>
-      </div>
-      <div id="sentimentTab" class="tab-content hidden">
-        <canvas id="sentimentChart" height="100"></canvas>
-      </div>
-    </div>
+  <div class="p-4 flex gap-4">
+
+    <button class="tab active bg-gray-300 px-3 py-1 rounded" data-tab="trends">
+      Trends
+    </button>
+
+    <button class="tab bg-gray-300 px-3 py-1 rounded" data-tab="compare">
+      Compare
+    </button>
+
+    <button class="tab bg-gray-300 px-3 py-1 rounded" data-tab="sentiment">
+      Sentiment
+    </button>
+
   </div>
 
-</div>
 
-<!-- Scripts -->
-<script src="scripts.js"></script>
+  <!-- Charts -->
+
+  <div class="p-4">
+
+    <div id="trendsTab" class="tab-content">
+      <canvas id="trendsChart"></canvas>
+    </div>
+
+    <div id="compareTab" class="tab-content hidden">
+      <canvas id="comparisonChart"></canvas>
+    </div>
+
+    <div id="sentimentTab" class="tab-content hidden">
+      <canvas id="sentimentChart"></canvas>
+    </div>
+
+  </div>
+
+
+  <!-- Script (IMPORTANT: defer) -->
+  <script src="./script.js" defer></script>
+
 </body>
+
 </html>
