@@ -100,126 +100,110 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* ================= UPDATE DASHBOARD ================= */
+function updateDashboard(ticker) {
 
-  function updateDashboard(ticker) {
+  const data = companyData[ticker];
+  if (!data) return;
 
-    const data = companyData[ticker];
+  // ---------- METRICS ----------
+  const metrics = document.getElementById("metricsContainer");
 
-    if (!data) return;
+  metrics.innerHTML = `
+    <div class="metric-card border-blue-500">
+      <div>Revenue</div>
+      <div class="mono">${data.revenue || "N/A"}</div>
+      <div class="positive">${data.revenueChange || ""}</div>
+    </div>
 
-    /* ----- METRICS ----- */
+    <div class="metric-card border-green-500">
+      <div>Net Income</div>
+      <div class="mono">${data.netIncome || "N/A"}</div>
+      <div class="positive">${data.incomeChange || ""}</div>
+    </div>
 
-    const metrics =
-      document.getElementById("metricsContainer");
+    <div class="metric-card border-purple-500">
+      <div>EPS</div>
+      <div class="mono">${data.eps || "N/A"}</div>
+      <div class="positive">${data.epsChange || ""}</div>
+    </div>
 
-    metrics.innerHTML = `
-      <div class="metric-card border-blue-500">
-        <div>Revenue</div>
-        <div class="mono">${data.revenue}</div>
-        <div class="positive">${data.revenueChange}</div>
-      </div>
-
-      <div class="metric-card border-green-500">
-        <div>Net Income</div>
-        <div class="mono">${data.netIncome}</div>
-        <div class="positive">${data.incomeChange}</div>
-      </div>
-
-      <div class="metric-card border-purple-500">
-        <div>EPS</div>
-        <div class="mono">${data.eps}</div>
-        <div class="positive">${data.epsChange}</div>
-      </div>
-
-      <div class="metric-card border-yellow-500">
-        <div>Sentiment</div>
-        <div>${data.sentiment}</div>
-        <div>${data.sentimentText}</div>
-      </div>
-    `;
+    <div class="metric-card border-yellow-500">
+      <div>Sentiment</div>
+      <div>${data.sentiment || "N/A"}</div>
+      <div>${data.sentimentText || ""}</div>
+    </div>
+  `;
 
 
-    /* ----- LINE CHART ----- */
+  // ---------- TREND CHART ----------
+  if (charts.trends) charts.trends.destroy();
 
-    const ctx =
-      document.getElementById("trendsChart");
-
-    if (charts.trends) charts.trends.destroy();
-
-    charts.trends = new Chart(ctx, {
+  charts.trends = new Chart(
+    document.getElementById("trendsChart"),
+    {
       type: "line",
-
       data: {
         labels: ["2019", "2020", "2021", "2022", "2023"],
-
         datasets: [
           {
             label: "Revenue ($B)",
-            data: data.trends,
+            data: data.trends || [],
+            borderWidth: 2,
             fill: true
           },
           {
             label: "Net Income ($B)",
-            data: data.earnings,
+            data: data.earnings || [],
+            borderWidth: 2,
             fill: true
           }
         ]
       },
-
-      options: {
-        responsive: true
-      }
-    });
+      options: { responsive: true }
+    }
+  );
 
 
-    /* ----- BAR CHART ----- */
+  // ---------- PEER CHART ----------
+  if (charts.bar) charts.bar.destroy();
 
-    const ctx2 =
-      document.getElementById("comparisonChart");
-
-    if (charts.bar) charts.bar.destroy();
-
-    charts.bar = new Chart(ctx2, {
+  charts.bar = new Chart(
+    document.getElementById("comparisonChart"),
+    {
       type: "bar",
-
       data: {
         labels: ["Apple", "Microsoft", "Google", "Amazon"],
-
         datasets: [
           {
             label: "Revenue",
-            data: data.peer
+            data: data.peer || [0,0,0,0]
           }
         ]
       },
-
-      options: {
-        responsive: true
-      }
-    });
+      options: { responsive: true }
+    }
+  );
 
 
-    /* ----- DOUGHNUT ----- */
+  // ---------- SENTIMENT CHART ----------
+  if (charts.doughnut) charts.doughnut.destroy();
 
-    const ctx3 =
-      document.getElementById("sentimentChart");
-
-    if (charts.doughnut) charts.doughnut.destroy();
-
-    charts.doughnut = new Chart(ctx3, {
+  charts.doughnut = new Chart(
+    document.getElementById("sentimentChart"),
+    {
       type: "doughnut",
-
       data: {
         labels: ["Apple", "Microsoft", "Google", "Amazon"],
-
         datasets: [
           {
-            data: data.sentimentScores
+            data: data.sentimentScores || [1,1,1,1]
           }
         ]
       }
-    });
-  }
+    }
+  );
+}
+
 
 
   /* ================= SELECT CHANGE ================= */
