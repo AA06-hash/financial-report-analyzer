@@ -1,66 +1,76 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ================= DARK MODE =================
+  /* ================= DARK MODE ================= */
+
   const toggleBtn = document.getElementById("toggleDark");
 
-  if (localStorage.getItem("darkMode") === "true") {
-    document.documentElement.classList.add("dark");
-  }
+  if (toggleBtn) {
 
-  updateDarkText();
-
-  toggleBtn.addEventListener("click", () => {
-    document.documentElement.classList.toggle("dark");
-
-    const dark =
-      document.documentElement.classList.contains("dark");
-
-    localStorage.setItem("darkMode", dark);
+    if (localStorage.getItem("darkMode") === "true") {
+      document.documentElement.classList.add("dark");
+    }
 
     updateDarkText();
-  });
 
-  function updateDarkText() {
-    toggleBtn.textContent =
-      document.documentElement.classList.contains("dark")
-        ? "☀️ Light Mode"
-        : "🌙 Dark Mode";
+    toggleBtn.addEventListener("click", () => {
+      document.documentElement.classList.toggle("dark");
+
+      const dark =
+        document.documentElement.classList.contains("dark");
+
+      localStorage.setItem("darkMode", dark);
+
+      updateDarkText();
+    });
+
+    function updateDarkText() {
+      toggleBtn.textContent =
+        document.documentElement.classList.contains("dark")
+          ? "☀️ Light Mode"
+          : "🌙 Dark Mode";
+    }
   }
 
-  // ================= TIMESTAMP =================
+  /* ================= TIMESTAMP ================= */
+
   const lastUpdated = document.getElementById("lastUpdated");
 
-  function updateLastUpdated() {
-    lastUpdated.textContent =
-      "Last Updated: " +
-      new Date().toLocaleTimeString();
+  if (lastUpdated) {
+
+    function updateLastUpdated() {
+      lastUpdated.textContent =
+        "Last Updated: " +
+        new Date().toLocaleTimeString();
+    }
+
+    updateLastUpdated();
+    setInterval(updateLastUpdated, 60000);
   }
 
-  updateLastUpdated();
-  setInterval(updateLastUpdated, 60000);
+  /* ================= SELECT ================= */
 
-  // ================= SELECT =================
   const companySelect =
     document.getElementById("companySelect");
 
-  // ================= DATA =================
+  /* ================= DATA ================= */
+
   const companies = ["AAPL", "MSFT", "GOOGL", "AMZN"];
 
   const companyData = {};
 
   let charts = {};
 
-  // ================= LOAD DATA =================
+  /* ================= LOAD DATA ================= */
+
   async function loadData() {
-    try {
 
-      for (const ticker of companies) {
+    for (const ticker of companies) {
 
-        const res = await fetch(`./data/${ticker}.json`);
+      try {
 
-        if (!res.ok) {
-          throw new Error("Missing " + ticker);
-        }
+        const res = await fetch(`data/${ticker}.json`);
+
+        if (!res.ok) continue;
 
         const data = await res.json();
 
@@ -73,30 +83,32 @@ document.addEventListener("DOMContentLoaded", () => {
         option.textContent = data.name;
 
         companySelect.appendChild(option);
+
+      } catch (err) {
+        console.warn("Missing:", ticker);
       }
+    }
 
+    if (companySelect.value) {
+      updateDashboard(companySelect.value);
+    } else {
       updateDashboard("AAPL");
-
-    } catch (err) {
-
-      console.error("Data Load Error:", err);
-
-      alert(
-        "Error loading company data. Check data folder."
-      );
     }
   }
 
   loadData();
 
-  // ================= UPDATE DASHBOARD =================
+
+  /* ================= UPDATE DASHBOARD ================= */
+
   function updateDashboard(ticker) {
 
     const data = companyData[ticker];
 
     if (!data) return;
 
-    // ----- METRICS -----
+    /* ----- METRICS ----- */
+
     const metrics =
       document.getElementById("metricsContainer");
 
@@ -126,7 +138,9 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
-    // ----- TREND CHART -----
+
+    /* ----- LINE CHART ----- */
+
     const ctx =
       document.getElementById("trendsChart");
 
@@ -142,26 +156,24 @@ document.addEventListener("DOMContentLoaded", () => {
           {
             label: "Revenue ($B)",
             data: data.trends,
-            borderWidth: 2,
             fill: true
           },
           {
             label: "Net Income ($B)",
             data: data.earnings,
-            borderWidth: 2,
             fill: true
           }
         ]
       },
 
       options: {
-        responsive: true,
-        maintainAspectRatio: false
+        responsive: true
       }
     });
 
 
-    // ----- BAR CHART -----
+    /* ----- BAR CHART ----- */
+
     const ctx2 =
       document.getElementById("comparisonChart");
 
@@ -187,7 +199,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // ----- DOUGHNUT -----
+    /* ----- DOUGHNUT ----- */
+
     const ctx3 =
       document.getElementById("sentimentChart");
 
@@ -208,67 +221,79 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ================= SELECT CHANGE =================
+
+  /* ================= SELECT CHANGE ================= */
+
   companySelect.addEventListener("change", e => {
     updateDashboard(e.target.value);
   });
 
-  // ================= TABS =================
-  document
-    .querySelectorAll(".tab")
-    .forEach(tab => {
 
-      tab.addEventListener("click", () => {
+  /* ================= TABS ================= */
 
-        document
-          .querySelectorAll(".tab")
-          .forEach(t =>
-            t.classList.remove("active")
-          );
+  document.querySelectorAll(".tab").forEach(tab => {
 
-        tab.classList.add("active");
+    tab.addEventListener("click", () => {
 
-        const target =
-          tab.dataset.tab + "Tab";
+      document.querySelectorAll(".tab")
+        .forEach(t => t.classList.remove("active"));
 
-        document
-          .querySelectorAll(".tab-content")
-          .forEach(c =>
-            c.classList.add("hidden")
-          );
+      tab.classList.add("active");
 
-        document
-          .getElementById(target)
-          .classList.remove("hidden");
-      });
+      const target = tab.dataset.tab + "Tab";
+
+      document.querySelectorAll(".tab-content")
+        .forEach(c => c.classList.add("hidden"));
+
+      const targetEl = document.getElementById(target);
+
+      if (targetEl) {
+        targetEl.classList.remove("hidden");
+      }
+
+      // Resize charts after showing tab
+      setTimeout(() => {
+        Object.values(charts).forEach(chart => {
+          chart.resize();
+        });
+      }, 100);
+
     });
 
-  // ================= VOICE =================
+  });
+
+
+  /* ================= VOICE ================= */
+
   const voiceBtn =
     document.getElementById("voiceBtn");
 
-  voiceBtn.addEventListener("click", () => {
+  if (voiceBtn) {
 
-    const ticker = companySelect.value;
+    voiceBtn.addEventListener("click", () => {
 
-    const data = companyData[ticker];
+      const ticker = companySelect.value;
 
-    if (!data) return;
+      const data = companyData[ticker];
 
-    const text = `
-      Financial summary for ${ticker}.
-      Revenue ${data.revenue}.
-      Net income ${data.netIncome}.
-      EPS ${data.eps}.
-      Sentiment ${data.sentimentText}.
-    `;
+      if (!data) return;
 
-    const speech =
-      new SpeechSynthesisUtterance(text);
+      const text = `
+        Financial summary for ${ticker}.
+        Revenue ${data.revenue}.
+        Net income ${data.netIncome}.
+        EPS ${data.eps}.
+        Sentiment ${data.sentimentText}.
+      `;
 
-    speech.rate = 1;
+      const speech =
+        new SpeechSynthesisUtterance(text);
 
-    window.speechSynthesis.speak(speech);
-  });
+      speech.rate = 1;
+
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(speech);
+    });
+  }
 
 });
