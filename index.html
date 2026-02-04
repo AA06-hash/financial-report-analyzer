@@ -7,99 +7,176 @@
 
   <title>Financial Report Analyzer</title>
 
-  <!-- Tailwind CDN -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="./style.css" />
-
+  <link rel="stylesheet" href="style.css" />
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
 
-  <!-- Header -->
-  <header class="bg-white dark:bg-gray-800 p-4 shadow flex justify-between items-center">
+<body class="h-full bg-slate-900 text-white">
 
-    <h1 class="text-2xl font-bold">
-      Financial Report Analyzer
-    </h1>
+  <!-- ================= HEADER ================= -->
+  <header class="max-w-7xl mx-auto p-6 flex justify-between items-center">
 
-    <div class="flex items-center gap-4">
+    <div>
+      <h1 class="text-3xl font-bold">
+        Financial Report Analyzer
+      </h1>
+
+      <p class="text-gray-400">
+        Real-time earnings & insights
+      </p>
+    </div>
+
+    <div class="flex gap-3 items-center">
 
       <span id="lastUpdated"></span>
 
-      <button id="toggleDark"
-        class="bg-gray-700 text-white px-3 py-1 rounded">
+      <button
+        id="toggleDark"
+        class="px-4 py-2 bg-gray-700 rounded">
         🌙 Dark Mode
       </button>
 
-    </div>
+      <!-- VOICE BUTTON -->
+      <button
+        id="voiceBtn"
+        class="px-4 py-2 bg-blue-600 rounded">
+        🔊 Hear Summary
+      </button>
 
+    </div>
   </header>
 
 
-  <!-- Controls -->
-  <div class="p-4 flex gap-4 items-center">
+  <!-- ================= MAIN ================= -->
+  <main class="max-w-7xl mx-auto p-6">
 
-    <select id="companySelect"
-      class="p-2 border rounded text-black">
-    </select>
+    <!-- SELECT -->
+    <div class="mb-6">
 
-    <button id="voiceBtn"
-      class="bg-blue-600 text-white px-4 py-2 rounded">
-      🎤 Voice Summary
-    </button>
+      <label class="block mb-2 font-semibold">
+        Select Company
+      </label>
 
-  </div>
+      <select
+        id="companySelect"
+        class="w-full p-3 bg-gray-800 rounded">
+      </select>
 
-
-  <!-- Metrics -->
-  <div id="metricsContainer"
-    class="grid grid-cols-1 md:grid-cols-4 gap-4 p-4">
-  </div>
-
-
-  <!-- Tabs -->
-  <div class="p-4 flex gap-4">
-
-    <button class="tab active bg-gray-300 px-3 py-1 rounded" data-tab="trends">
-      Trends
-    </button>
-
-    <button class="tab bg-gray-300 px-3 py-1 rounded" data-tab="compare">
-      Compare
-    </button>
-
-    <button class="tab bg-gray-300 px-3 py-1 rounded" data-tab="sentiment">
-      Sentiment
-    </button>
-
-  </div>
-
-
-  <!-- Charts -->
-
-  <div class="p-4">
-
-    <div id="trendsTab" class="tab-content">
-      <canvas id="trendsChart"></canvas>
     </div>
 
-    <div id="compareTab" class="tab-content hidden">
-      <canvas id="comparisonChart"></canvas>
+
+    <!-- METRICS -->
+    <div
+      id="metricsContainer"
+      class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
     </div>
 
-    <div id="sentimentTab" class="tab-content hidden">
-      <canvas id="sentimentChart"></canvas>
+
+    <!-- ================= TABS ================= -->
+    <div class="bg-gray-800 rounded p-5">
+
+      <!-- TAB BUTTONS -->
+      <div class="flex gap-6 border-b pb-3 mb-5">
+
+        <button
+          class="tab active"
+          data-tab="trends">
+
+          📈 Trends
+        </button>
+
+        <button
+          class="tab"
+          data-tab="peer">
+
+          👥 Peer Comparison
+        </button>
+
+        <button
+          class="tab"
+          data-tab="risk">
+
+          ⚠️ Risk Factors
+        </button>
+
+        <button
+          class="tab"
+          data-tab="sentiment">
+
+          💬 Sentiment
+        </button>
+
+      </div>
+
+
+      <!-- ================= TAB CONTENT ================= -->
+
+      <!-- TRENDS -->
+      <div id="trendsTab" class="tab-content">
+
+        <canvas
+          id="trendsChart"
+          height="120">
+        </canvas>
+
+      </div>
+
+
+      <!-- PEER -->
+      <div
+        id="peerTab"
+        class="tab-content hidden">
+
+        <canvas
+          id="comparisonChart"
+          height="120">
+        </canvas>
+
+      </div>
+
+
+      <!-- RISK -->
+      <div
+        id="riskTab"
+        class="tab-content hidden">
+
+        <ul class="space-y-3 text-gray-300">
+
+          <li>• Market volatility</li>
+          <li>• Regulatory changes</li>
+          <li>• Global competition</li>
+          <li>• Supply chain issues</li>
+
+        </ul>
+
+      </div>
+
+
+      <!-- SENTIMENT -->
+      <div
+        id="sentimentTab"
+        class="tab-content hidden">
+
+        <canvas
+          id="sentimentChart"
+          height="120">
+        </canvas>
+
+      </div>
+
     </div>
 
-  </div>
+  </main>
 
 
-  <!-- Script (IMPORTANT: defer) -->
+  <!-- JS -->
   <script src="./script.js" defer></script>
 
 </body>
