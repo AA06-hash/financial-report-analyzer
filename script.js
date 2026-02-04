@@ -1,283 +1,146 @@
-document.addEventListener("DOMContentLoaded", () => {
+// ---------- Dark Mode ----------
+const toggleBtn = document.getElementById('toggleDark');
+if(localStorage.getItem('darkMode')==='true') document.documentElement.classList.add('dark');
+toggleBtn.textContent = document.documentElement.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
 
-  /* ================= DARK MODE ================= */
+toggleBtn.addEventListener('click', ()=>{
+  document.documentElement.classList.toggle('dark');
+  const dark = document.documentElement.classList.contains('dark');
+  toggleBtn.textContent = dark ? '☀️ Light Mode' : '🌙 Dark Mode';
+  localStorage.setItem('darkMode', dark);
+});
 
-  const toggleBtn = document.getElementById("toggleDark");
+// ---------- Timestamp ----------
+const lastUpdated = document.getElementById('lastUpdated');
+function updateLastUpdated(){ lastUpdated.textContent = `Last Updated: ${new Date().toLocaleTimeString()}`; }
+updateLastUpdated();
+setInterval(updateLastUpdated,60000);
 
-  if (toggleBtn) {
+// ---------- Company Selector ----------
+const companySelect = document.getElementById('companySelect');
+let charts = {};
 
-    if (localStorage.getItem("darkMode") === "true") {
-      document.documentElement.classList.add("dark");
-    }
+// ---------- Fetch JSON Data ----------
+const companies = ["AAPL","MSFT","GOOGL","AMZN"];
+const companyData = {};
 
-    updateDarkText();
-
-    toggleBtn.addEventListener("click", () => {
-      document.documentElement.classList.toggle("dark");
-
-      const dark =
-        document.documentElement.classList.contains("dark");
-
-      localStorage.setItem("darkMode", dark);
-
-      updateDarkText();
-    });
-
-    function updateDarkText() {
-      toggleBtn.textContent =
-        document.documentElement.classList.contains("dark")
-          ? "☀️ Light Mode"
-          : "🌙 Dark Mode";
-    }
+async function loadData(){
+  for(const ticker of companies){
+    const res = await fetch(`data/${ticker}.json`);
+    companyData[ticker] = await res.json();
+    const option = document.createElement('option');
+    option.value = ticker;
+    option.textContent = companyData[ticker].name;
+    companySelect.appendChild(option);
   }
+  updateDashboard('AAPL');
+}
 
-  /* ================= TIMESTAMP ================= */
+loadData();
 
-  const lastUpdated = document.getElementById("lastUpdated");
+// ---------- Helper Function ----------
+function updateChangeColor(element, value){
+  element.className = value.startsWith('↑') ? 'text-sm positive' : value.startsWith('↓') ? 'text-sm negative' : 'text-sm neutral';
+  element.textContent = value;
+}
 
-  if (lastUpdated) {
-
-    function updateLastUpdated() {
-      lastUpdated.textContent =
-        "Last Updated: " +
-        new Date().toLocaleTimeString();
-    }
-
-    updateLastUpdated();
-    setInterval(updateLastUpdated, 60000);
-  }
-
-  /* ================= SELECT ================= */
-
-  const companySelect =
-    document.getElementById("companySelect");
-
-  /* ================= DATA ================= */
-
-  const companies = ["AAPL", "MSFT", "GOOGL", "AMZN"];
-
-  const companyData = {};
-
-  let charts = {};
-
-  /* ================= LOAD DATA ================= */
-
-  async function loadData() {
-
-    for (const ticker of companies) {
-
-      try {
-
-        const res = await fetch(`data/${ticker}.json`);
-
-        if (!res.ok) continue;
-
-        const data = await res.json();
-
-        companyData[ticker] = data;
-
-        const option =
-          document.createElement("option");
-
-        option.value = ticker;
-        option.textContent = data.name;
-
-        companySelect.appendChild(option);
-
-      } catch (err) {
-        console.warn("Missing:", ticker);
-      }
-    }
-
-    if (companySelect.value) {
-      updateDashboard(companySelect.value);
-    } else {
-      updateDashboard("AAPL");
-    }
-  }
-
-  loadData();
-
-
-  /* ================= UPDATE DASHBOARD ================= */
-function updateDashboard(ticker) {
-
+// ---------- Update Dashboard ----------
+function updateDashboard(ticker){
   const data = companyData[ticker];
-  if (!data) return;
-
-  // ---------- METRICS ----------
-  const metrics = document.getElementById("metricsContainer");
-
-  metrics.innerHTML = `
+  
+  // Metrics
+  const metricsContainer = document.getElementById('metricsContainer');
+  metricsContainer.innerHTML = `
     <div class="metric-card border-blue-500">
-      <div>Revenue</div>
-      <div class="mono">${data.revenue || "N/A"}</div>
-      <div class="positive">${data.revenueChange || ""}</div>
+      <div class="text-sm font-semibold">Revenue (TTM)</div>
+      <div class="text-xl font-bold mono">${data.revenue}</div>
+      <div class="text-sm ${data.revenueChange.startsWith('↑')?'positive':'negative'}">${data.revenueChange}</div>
     </div>
-
     <div class="metric-card border-green-500">
-      <div>Net Income</div>
-      <div class="mono">${data.netIncome || "N/A"}</div>
-      <div class="positive">${data.incomeChange || ""}</div>
+      <div class="text-sm font-semibold">Net Income</div>
+      <div class="text-xl font-bold mono">${data.netIncome}</div>
+      <div class="text-sm ${data.incomeChange.startsWith('↑')?'positive':'negative'}">${data.incomeChange}</div>
     </div>
-
     <div class="metric-card border-purple-500">
-      <div>EPS</div>
-      <div class="mono">${data.eps || "N/A"}</div>
-      <div class="positive">${data.epsChange || ""}</div>
+      <div class="text-sm font-semibold">EPS</div>
+      <div class="text-xl font-bold mono">${data.eps}</div>
+      <div class="text-sm ${data.epsChange.startsWith('↑')?'positive':'negative'}">${data.epsChange}</div>
     </div>
-
     <div class="metric-card border-yellow-500">
-      <div>Sentiment</div>
-      <div>${data.sentiment || "N/A"}</div>
-      <div>${data.sentimentText || ""}</div>
+      <div class="text-sm font-semibold">Sentiment Score</div>
+      <div class="text-xl font-bold">${data.sentiment}</div>
+      <div class="text-sm text-gray-500 dark:text-gray-300">${data.sentimentText}</div>
     </div>
   `;
 
+  // Charts
+  const ctx = document.getElementById('trendsChart');
+  if(charts.trends) charts.trends.destroy();
+  charts.trends = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:['2019','2020','2021','2022','2023'],
+      datasets:[
+        {label:'Revenue ($B)', data:data.trends, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.1)', fill:true, tension:0.3, borderWidth:2},
+        {label:'Net Income ($B)', data:data.earnings, borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.1)', fill:true, tension:0.3, borderWidth:2}
+      ]
+    },
+    options:{responsive:true, plugins:{legend:{position:'top'}}, scales:{y:{beginAtZero:true}}}
+  });
 
-  // ---------- TREND CHART ----------
-  if (charts.trends) charts.trends.destroy();
+  const ctx2 = document.getElementById('comparisonChart');
+  if(charts.comparison) charts.comparison.destroy();
+  charts.comparison = new Chart(ctx2,{
+    type:'bar',
+    data:{
+      labels:['Apple','Microsoft','Google','Amazon'],
+      datasets:[{label:'Revenue ($B)', data:data.peer, backgroundColor:['#3b82f6','#10b981','#8b5cf6','#f59e0b'] }]
+    },
+    options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+  });
 
-  charts.trends = new Chart(
-    document.getElementById("trendsChart"),
-    {
-      type: "line",
-      data: {
-        labels: ["2019", "2020", "2021", "2022", "2023"],
-        datasets: [
-          {
-            label: "Revenue ($B)",
-            data: data.trends || [],
-            borderWidth: 2,
-            fill: true
-          },
-          {
-            label: "Net Income ($B)",
-            data: data.earnings || [],
-            borderWidth: 2,
-            fill: true
-          }
-        ]
-      },
-      options: { responsive: true }
-    }
-  );
-
-
-  // ---------- PEER CHART ----------
-  if (charts.bar) charts.bar.destroy();
-
-  charts.bar = new Chart(
-    document.getElementById("comparisonChart"),
-    {
-      type: "bar",
-      data: {
-        labels: ["Apple", "Microsoft", "Google", "Amazon"],
-        datasets: [
-          {
-            label: "Revenue",
-            data: data.peer || [0,0,0,0]
-          }
-        ]
-      },
-      options: { responsive: true }
-    }
-  );
-
-
-  // ---------- SENTIMENT CHART ----------
-  if (charts.doughnut) charts.doughnut.destroy();
-
-  charts.doughnut = new Chart(
-    document.getElementById("sentimentChart"),
-    {
-      type: "doughnut",
-      data: {
-        labels: ["Apple", "Microsoft", "Google", "Amazon"],
-        datasets: [
-          {
-            data: data.sentimentScores || [1,1,1,1]
-          }
-        ]
-      }
-    }
-  );
+  const ctx3 = document.getElementById('sentimentChart');
+  if(charts.sentiment) charts.sentiment.destroy();
+  charts.sentiment = new Chart(ctx3,{
+    type:'doughnut',
+    data:{labels:['Apple','Microsoft','Google','Amazon'], datasets:[{data:data.sentimentScores, backgroundColor:['#3b82f6','#10b981','#8b5cf6','#f59e0b']}]},
+    options:{responsive:true, plugins:{legend:{position:'bottom'}}}
+  });
 }
 
-
-
-  /* ================= SELECT CHANGE ================= */
-
-  companySelect.addEventListener("change", e => {
-    updateDashboard(e.target.value);
+// ---------- Tabs ----------
+const tabs = document.querySelectorAll('.tab');
+const tabContents = document.querySelectorAll('.tab-content');
+tabs.forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    tabs.forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const target=tab.dataset.tab+'Tab';
+    tabContents.forEach(c=>c.classList.add('hidden'));
+    document.getElementById(target).classList.remove('hidden');
   });
+});
 
+companySelect.addEventListener('change', e=>updateDashboard(e.target.value));
 
-  /* ================= TABS ================= */
-
-  document.querySelectorAll(".tab").forEach(tab => {
-
-    tab.addEventListener("click", () => {
-
-      document.querySelectorAll(".tab")
-        .forEach(t => t.classList.remove("active"));
-
-      tab.classList.add("active");
-
-      const target = tab.dataset.tab + "Tab";
-
-      document.querySelectorAll(".tab-content")
-        .forEach(c => c.classList.add("hidden"));
-
-      const targetEl = document.getElementById(target);
-
-      if (targetEl) {
-        targetEl.classList.remove("hidden");
-      }
-
-      // Resize charts after showing tab
-      setTimeout(() => {
-        Object.values(charts).forEach(chart => {
-          chart.resize();
-        });
-      }, 100);
-
-    });
-
-  });
-
-
-  /* ================= VOICE ================= */
-
-  const voiceBtn =
-    document.getElementById("voiceBtn");
-
-  if (voiceBtn) {
-
-    voiceBtn.addEventListener("click", () => {
-
-      const ticker = companySelect.value;
-
-      const data = companyData[ticker];
-
-      if (!data) return;
-
-      const text = `
-        Financial summary for ${ticker}.
-        Revenue ${data.revenue}.
-        Net income ${data.netIncome}.
-        EPS ${data.eps}.
-        Sentiment ${data.sentimentText}.
-      `;
-
-      const speech =
-        new SpeechSynthesisUtterance(text);
-
-      speech.rate = 1;
-
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(speech);
-    });
-  }
-
+// ---------- Voice Summary ----------
+const voiceBtn = document.getElementById('voiceBtn');
+function speakSummary(ticker){
+  const data = companyData[ticker];
+  const text = `
+    Financial summary for ${ticker}.
+    Revenue is ${data.revenue}.
+    Net income is ${data.netIncome}.
+    Earnings per share is ${data.eps}.
+    Overall sentiment is ${data.sentimentText}.
+  `;
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.rate = 1;
+  speech.pitch = 1;
+  speech.volume = 1;
+  window.speechSynthesis.speak(speech);
+}
+voiceBtn.addEventListener('click', ()=>{
+  const ticker = companySelect.value;
+  speakSummary(ticker);
 });

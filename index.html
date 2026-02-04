@@ -1,184 +1,69 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Report Analyzer</title>
 
-  <title>Financial Report Analyzer</title>
+<!-- Fonts & CSS -->
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="style.css" />
+<!-- Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="h-full m-0 p-0">
+<div class="w-full max-w-7xl mx-auto p-4">
 
-
-<body class="h-full bg-slate-900 text-white">
-
-  <!-- ================= HEADER ================= -->
-  <header class="max-w-7xl mx-auto p-6 flex justify-between items-center">
-
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
     <div>
-      <h1 class="text-3xl font-bold">
-        Financial Report Analyzer
-      </h1>
-
-      <p class="text-gray-400">
-        Real-time earnings & insights
-      </p>
+      <h1 class="text-3xl font-bold">Financial Report Analyzer</h1>
+      <p class="text-gray-500 dark:text-gray-300">Real-time earnings & insights</p>
     </div>
-
-    <div class="flex gap-3 items-center">
-
-      <span id="lastUpdated"></span>
-
-      <button
-        id="toggleDark"
-        class="px-4 py-2 bg-gray-700 rounded">
-        🌙 Dark Mode
-      </button>
-
-      <!-- VOICE BUTTON -->
-      <button
-        id="voiceBtn"
-        class="px-4 py-2 bg-blue-600 rounded">
-        🔊 Hear Summary
-      </button>
-
+    <div class="flex items-center">
+      <span id="lastUpdated" class="mono mr-4"></span>
+      <button id="toggleDark">🌙 Dark Mode</button>
+      <button id="voiceBtn" class="ml-2 bg-blue-600 text-white px-3 py-1 rounded">🔊 Hear Summary</button>
     </div>
-  </header>
+  </div>
 
+  <!-- Company Selector -->
+  <div class="card mb-6">
+    <label for="companySelect" class="block mb-2 font-semibold">Select Company</label>
+    <select id="companySelect" class="w-full p-3 rounded-lg"></select>
+  </div>
 
-  <!-- ================= MAIN ================= -->
-  <main class="max-w-7xl mx-auto p-6">
+  <!-- Key Metrics -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8" id="metricsContainer"></div>
 
-    <!-- SELECT -->
-    <div class="mb-6">
-
-      <label class="block mb-2 font-semibold">
-        Select Company
-      </label>
-
-      <select
-        id="companySelect"
-        class="w-full p-3 bg-gray-800 rounded">
-      </select>
-
+  <!-- Tabs -->
+  <div class="card mb-6">
+    <div class="flex border-b border-gray-200 dark:border-gray-600" id="tabContainer">
+      <div class="tab active" data-tab="trends">📊 Trends</div>
+      <div class="tab" data-tab="comparison">🔍 Peer Comparison</div>
+      <div class="tab" data-tab="risks">⚠️ Risk Factors</div>
+      <div class="tab" data-tab="sentiment">💬 Sentiment</div>
     </div>
-
-
-    <!-- METRICS -->
-    <div
-      id="metricsContainer"
-      class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-    </div>
-
-
-    <!-- ================= TABS ================= -->
-    <div class="bg-gray-800 rounded p-5">
-
-      <!-- TAB BUTTONS -->
-      <div class="flex gap-6 border-b pb-3 mb-5">
-
-        <button
-          class="tab active"
-          data-tab="trends">
-
-          📈 Trends
-        </button>
-
-        <button
-          class="tab"
-          data-tab="peer">
-
-          👥 Peer Comparison
-        </button>
-
-        <button
-          class="tab"
-          data-tab="risk">
-
-          ⚠️ Risk Factors
-        </button>
-
-        <button
-          class="tab"
-          data-tab="sentiment">
-
-          💬 Sentiment
-        </button>
-
-      </div>
-
-
-      <!-- ================= TAB CONTENT ================= -->
-
-      <!-- TRENDS -->
+    <div id="tabContent" class="p-4">
       <div id="trendsTab" class="tab-content">
-
-        <canvas
-          id="trendsChart"
-          height="120">
-        </canvas>
-
+        <canvas id="trendsChart" height="100"></canvas>
       </div>
-
-
-      <!-- PEER -->
-      <div
-        id="peerTab"
-        class="tab-content hidden">
-
-        <canvas
-          id="comparisonChart"
-          height="120">
-        </canvas>
-
+      <div id="comparisonTab" class="tab-content hidden">
+        <canvas id="comparisonChart" height="100"></canvas>
       </div>
-
-
-      <!-- RISK -->
-      <div
-        id="riskTab"
-        class="tab-content hidden">
-
-        <ul class="space-y-3 text-gray-300">
-
-          <li>• Market volatility</li>
-          <li>• Regulatory changes</li>
-          <li>• Global competition</li>
-          <li>• Supply chain issues</li>
-
-        </ul>
-
+      <div id="risksTab" class="tab-content hidden">
+        <p>Supply chain, competition, and regulatory risks.</p>
       </div>
-
-
-      <!-- SENTIMENT -->
-      <div
-        id="sentimentTab"
-        class="tab-content hidden">
-
-        <canvas
-          id="sentimentChart"
-          height="120">
-        </canvas>
-
+      <div id="sentimentTab" class="tab-content hidden">
+        <canvas id="sentimentChart" height="100"></canvas>
       </div>
-
     </div>
+  </div>
 
-  </main>
+</div>
 
-
-  <!-- JS -->
-  <script src="./script.js" defer></script>
-
+<script src="script.js"></script>
 </body>
-
 </html>
